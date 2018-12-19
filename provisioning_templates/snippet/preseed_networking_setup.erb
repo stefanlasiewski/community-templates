@@ -16,7 +16,7 @@ description: this will configure your host networking, it configures your primar
 
 real=`ip -o link | awk '/<%= @host.mac -%>/ {print $2;}' | sed s/://`
 <%# Ubuntu 18.04 and newer uses netplan instead of /etc/network/interfaces -%>
-<% if is_ubuntu && os_major > 17 -%>
+<% if is_ubuntu && os_major >= 18 -%>
 cat << EOF > /etc/netplan/01-netcfg.yaml
 # This file describes the network interfaces available on your system
 # For more information, see netplan(5).
@@ -26,11 +26,15 @@ network:
   ethernets:
     #<%= @host.primary_interface.identifier %>
     $real:
+<% if host_dhcp6 -%>
+      dhcp6: true
+<% end -%>
 <% if host_dhcp -%>
       dhcp4: true
 <% else -%>
       addresses: [ <%= @host.ip %>/<%= host_subnet.cidr %><% if @host.ip6 && host_subnet6 && !host_dhcp6 -%>, <%= @host.ip6 %>/<%= host_subnet6.cidr %><% end -%> ]
       gateway4: <%= host_subnet.gateway %>
+      <% if host_subnet6.gateway -%>gateway6: <%= host_subnet6.gateway %><% end -%>
       nameservers:
           search: [ <%= @host.domain %> ]
           addresses: [ <%= host_subnet.dns_primary %><% if host_subnet.dns_secondary -%>, <%= host_subnet.dns_secondary %><% end -%> ]
