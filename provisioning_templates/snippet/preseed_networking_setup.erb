@@ -33,7 +33,7 @@ network:
 <% else -%>
       addresses: [ <%= @host.ip %>/<%= host_subnet.cidr %><% if @host.ip6 && host_subnet6 && !host_dhcp6 -%>, <%= @host.ip6 %>/<%= host_subnet6.cidr %><% end -%> ]
       gateway4: <%= host_subnet.gateway %>
-      <% if host_subnet6.gateway -%>gateway6: <%= host_subnet6.gateway %><% end -%>
+      <% if host_subnet6.gateway -%>gateway6: <%= host_subnet6.gateway %><% end %>
       nameservers:
           search: [ <%= @host.domain %> ]
           addresses: [ <%= host_subnet.dns_primary %><% if host_subnet.dns_secondary -%>, <%= host_subnet.dns_secondary %><% end -%> ]
